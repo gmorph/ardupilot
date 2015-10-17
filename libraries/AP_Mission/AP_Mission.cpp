@@ -544,6 +544,9 @@ MAV_MISSION_RESULT AP_Mission::mavlink_int_to_mission_cmd(const mavlink_mission_
         // delay at waypoint in seconds
         cmd.p1 = packet.param1;                         
 #endif
+#if APM_BUILD_TYPE(APM_BUILD_APMrover2)
+        cmd.content.nav_waypoint_params.loiter_actively = packet.param2;
+#endif
         break;
 
     case MAV_CMD_NAV_LOITER_UNLIM:                      // MAV ID: 17
@@ -980,6 +983,9 @@ bool AP_Mission::mission_cmd_to_mavlink_int(const AP_Mission::Mission_Command& c
 #else
         // delay at waypoint in seconds
         packet.param1 = cmd.p1;
+#endif
+#if APM_BUILD_TYPE(APM_BUILD_APMrover2)
+        packet.param2 = cmd.content.nav_waypoint_params.loiter_actively;
 #endif
         break;
 
