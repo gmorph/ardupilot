@@ -365,7 +365,9 @@ private:
     // Loiter control
     uint16_t loiter_time_max; // How long we should loiter at the nav_waypoint (time in seconds)
     uint32_t loiter_time;     // How long have we been loitering - The start time in millis
+    bool loiter_active; // TRUE if we actively return to the loitering waypoint if we drift off
     float distance_past_wp; // record the distance we have gone past the wp
+    bool loiter_reached_wp;  // set to true if we have reached the WP and we are going to loiter
 
     // time that rudder/steering arming has been running
     uint32_t rudder_arm_timer;
@@ -540,6 +542,8 @@ private:
     void update_home();
     void accel_cal_update(void);
     void nav_set_yaw_speed();
+    bool in_stationary_loiter(void);
+
 public:
     bool print_log_menu(void);
     int8_t dump_log(uint8_t argc, const Menu::arg *argv);

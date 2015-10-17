@@ -215,8 +215,25 @@ void Rover::do_nav_wp(const AP_Mission::Mission_Command& cmd)
     // this is the delay, stored in seconds
     loiter_time_max = cmd.p1;
 
+    // this parameter controls if we actively loiter - that is if we drift off the
+    // waypoint for whatever reason then power up and return to it but only if
+    // loitering is enabled
+    if (loiter_time_max > 0) {
+        if (abs(cmd.content.nav_waypoint_params.loiter_actively) > 0) {
+            loiter_active = true;
+        } else {
+            loiter_active = false;
+        }
+    }
+
+    // REMOVE AFTER FINISHED TESTING
+    loiter_active = true;
+
     // this is the distance we travel past the waypoint - not there yet so 0 initially
     distance_past_wp = 0;
+
+    // True if we have reached a waypoint and we are going to loiter there
+    loiter_reached_wp = false;
 
 	set_next_WP(cmd.content.location);
 }
@@ -245,6 +262,16 @@ bool Rover::verify_nav_wp(const AP_Mission::Mission_Command& cmd)
                 // record the current time i.e. start timer
                 loiter_time = millis();
             }
+
+            // If we trying to loiter and have previously reached this waypoint then we
+            // want to update how far we are past it this time through.
+            // If this is the first time we have reached it then set loiter_reached_wp true
+            if (loiter_reached_wp) {
+                distance_past_wp = wp_distance;
+            } else {
+                loiter_reached_wp = true;
+            }
+
             // Check if we have loiter long enough
             if (((millis() - loiter_time) / 1000) < loiter_time_max) {
                 return false;
@@ -254,6 +281,7 @@ bool Rover::verify_nav_wp(const AP_Mission::Mission_Command& cmd)
                               (unsigned)cmd.index,
                               (unsigned)get_distance(current_loc, next_WP));
         }
+        loiter_reached_wp = false;
         return true;
     }
 
@@ -261,6 +289,8 @@ bool Rover::verify_nav_wp(const AP_Mission::Mission_Command& cmd)
     // We should always go through the waypoint i.e. the above code
     // first before we go past it.
     if (location_passed_point(current_loc, prev_WP, next_WP)) {
+// the one below for active loitering?        
+//    if (loiter_reached_wp  && ((wp_distance > 0) && (wp_distance > g.waypoint_radius))) {
         // check if we have gone further past the wp then last time and output new message if we have
         if ((uint32_t)distance_past_wp != (uint32_t)get_distance(current_loc, next_WP)) {
             distance_past_wp = get_distance(current_loc, next_WP);
@@ -274,6 +304,7 @@ bool Rover::verify_nav_wp(const AP_Mission::Mission_Command& cmd)
                 return false;
             }
         }
+        loiter_reached_wp = false;
         distance_past_wp = 0;
         return true;
     }
