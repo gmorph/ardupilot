@@ -543,6 +543,7 @@ private:
     void accel_cal_update(void);
     void nav_set_yaw_speed();
     bool in_stationary_loiter(void);
+    void set_loiter_active(const AP_Mission::Mission_Command& cmd);
 
 public:
     bool print_log_menu(void);
