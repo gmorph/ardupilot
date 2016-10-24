@@ -99,7 +99,7 @@ void Rover::calc_throttle(float target_speed) {
     // If not autostarting OR we are loitering at a waypoint
     // then set the throttle to minimum
     if (!auto_check_trigger() || in_stationary_loiter()) {
-        channel_throttle->servo_out = g.throttle_min.get();
+        channel_throttle->set_servo_out(g.throttle_min.get());
         // Stop rotation in case of loitering and skid steering
         if (g.skid_steer_out) {
             channel_steer->set_servo_out(0);

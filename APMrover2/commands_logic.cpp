@@ -213,7 +213,7 @@ void Rover::set_loiter_active(const AP_Mission::Mission_Command& cmd)
     // this parameter controls if we actively loiter - that is if we drift off the
     // waypoint for whatever reason then power up and return to it but only if
     // loitering is enabled
-    gcs_send_text_fmt(PSTR("set_loiter_active %i"),
+    gcs_send_text_fmt(MAV_SEVERITY_INFO, "set_loiter_active %i",
                       cmd.content.nav_waypoint_params.loiter_actively);
     if ((loiter_time_max > 0)  &&
         (abs(cmd.content.nav_waypoint_params.loiter_actively) > 0)) {
