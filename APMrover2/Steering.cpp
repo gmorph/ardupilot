@@ -179,8 +179,8 @@ void Rover::calc_throttle(float target_speed) {
 void Rover::calc_lateral_acceleration() {
     switch (control_mode) {
     case AUTO:
-        // If we have reached the waypoint previously navigate from
-        // our current position
+        // If we have reached the waypoint previously navigate
+        // back to it from our current position
         if (loiter_reached_wp) {
             nav_controller->update_waypoint(current_loc, next_WP);
         } else {

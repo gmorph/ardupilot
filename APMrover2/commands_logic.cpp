@@ -210,17 +210,13 @@ void Rover::do_RTL(void)
 
 void Rover::set_loiter_active(const AP_Mission::Mission_Command& cmd)
 {
+    loiter_active = false;
     // this parameter controls if we actively loiter - that is if we drift off the
     // waypoint for whatever reason then power up and return to it but only if
     // loitering is enabled
-    gcs_send_text_fmt(MAV_SEVERITY_INFO, "set_loiter_active %i",
-                      cmd.content.nav_waypoint_params.loiter_actively);
-    if ((loiter_time_max > 0)  &&
-        (abs(cmd.content.nav_waypoint_params.loiter_actively) > 0)) {
+    if ((loiter_time_max > 0) && cmd.content.location.flags.loiter_ccw) {
         loiter_active = true;
-        return;
     }
-    loiter_active = false;
 }
 
 void Rover::do_nav_wp(const AP_Mission::Mission_Command& cmd)
@@ -266,7 +262,7 @@ bool Rover::verify_nav_wp(const AP_Mission::Mission_Command& cmd)
                 loiter_time = millis();
             }
 
-            // If we trying to loiter and have previously reached this waypoint then we
+            // If we are trying to loiter and have previously reached this waypoint then we
             // want to update how far we are past it this time through.
             // If this is the first time we have reached it then set loiter_reached_wp true
             if (loiter_reached_wp) {
@@ -292,8 +288,6 @@ bool Rover::verify_nav_wp(const AP_Mission::Mission_Command& cmd)
     // We should always go through the waypoint i.e. the above code
     // first before we go past it.
     if (location_passed_point(current_loc, prev_WP, next_WP)) {
-// the one below for active loitering?        
-//    if (loiter_reached_wp  && ((wp_distance > 0) && (wp_distance > g.waypoint_radius))) {
         // check if we have gone further past the wp then last time and output new message if we have
         if ((uint32_t)distance_past_wp != (uint32_t)get_distance(current_loc, next_WP)) {
             distance_past_wp = get_distance(current_loc, next_WP);
