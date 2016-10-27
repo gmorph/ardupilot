@@ -545,7 +545,8 @@ MAV_MISSION_RESULT AP_Mission::mavlink_int_to_mission_cmd(const mavlink_mission_
         cmd.p1 = packet.param1;                         
 #endif
 #if APM_BUILD_TYPE(APM_BUILD_APMrover2)
-        cmd.content.nav_waypoint_params.loiter_actively = packet.param2;
+        // In Rover use the loiter_ccw flag to signify active loitering
+        cmd.content.location.flags.loiter_ccw = (packet.param2 > 0); // 1 for active loiter at waypoint, 0 for not
 #endif
         break;
 
@@ -985,7 +986,8 @@ bool AP_Mission::mission_cmd_to_mavlink_int(const AP_Mission::Mission_Command& c
         packet.param1 = cmd.p1;
 #endif
 #if APM_BUILD_TYPE(APM_BUILD_APMrover2)
-        packet.param2 = cmd.content.nav_waypoint_params.loiter_actively;
+        // In Rover use the loiter_ccw flag to signify active loitering
+        packet.param2 = cmd.content.location.flags.loiter_ccw; // 1 for active loiter at waypoint, 0 for not - default is not
 #endif
         break;
 

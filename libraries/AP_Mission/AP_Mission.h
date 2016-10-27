@@ -53,11 +53,6 @@ public:
         float seconds;          // period of delay in seconds
     };
 
-    // MAV_CMD_NAV_WAYPOINT additional parameters
-    struct PACKED Nav_Waypoint_Command_Params {
-        uint8_t loiter_actively;          // boolean do we actively loiter (1) or not (0)?
-    };
-
     // condition delay command structure
     struct PACKED Conditional_Distance_Command {
         float meters;           // distance from next waypoint in meters
@@ -243,8 +238,6 @@ public:
         // raw bytes, for reading/writing to eeprom. Note that only 10 bytes are available
         // if a 16 bit command ID is used
         uint8_t bytes[12];
-
-        Nav_Waypoint_Command_Params nav_waypoint_params;
     };
 
     // command structure
