@@ -81,10 +81,10 @@ bool Rover::use_pivot_steering(void) {
 bool Rover::in_stationary_loiter()
 {
     // Confirm we are in AUTO mode and need to loiter for a time period
-    if ((loiter_time > 0) && (control_mode == AUTO)) {
+    if ((loiter_start_time > 0) && (control_mode == AUTO)) {
         // Check if active loiter is enabled AND we are outside the waypoint loiter radius
         // then NOT the result for the if logic
-        if (!(loiter_active && (distance_past_wp > g.waypoint_radius))) {
+        if (!(active_loiter && (wp_distance > g.waypoint_radius))) {
             return true;
         }
     }
@@ -181,7 +181,7 @@ void Rover::calc_lateral_acceleration() {
     case AUTO:
         // If we have reached the waypoint previously navigate
         // back to it from our current position
-        if (loiter_reached_wp) {
+        if (previously_reached_wp && (loiter_duration > 0)) {
             nav_controller->update_waypoint(current_loc, next_WP);
         } else {
             nav_controller->update_waypoint(prev_WP, next_WP);
