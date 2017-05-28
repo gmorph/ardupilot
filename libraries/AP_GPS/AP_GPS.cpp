@@ -252,6 +252,13 @@ const AP_Param::GroupInfo AP_GPS::var_info[] = {
     // @User: Advanced
     AP_GROUPINFO("BLEND_TC", 21, AP_GPS, _blend_tc, 10.0f),
 
+    // @Param: HDT_ENABLE
+    // @DisplayName: Use NMEA Heading Sentence
+    // @Description: Enables the ArduPilot system to use the NMEA HDT heading sentence for heading information rather then a compass.  The compass heading will be completely ignored if you enable this and ArduPilot is receiving HDT sentences.  It is assumed you have a GPS that is capable of determining heading accurately at all times including whilst stationary.  This usually means a very expensive GPS capable of calculating phase differences in signals.
+    // @Values: 0:Disabled,1:Enabled
+    // @User: Advanced
+    AP_GROUPINFO("HDT_ENABLE", 22, AP_GPS, _heading_enable, 0),
+
     AP_GROUPEND
 };
 
@@ -1458,4 +1465,21 @@ void AP_GPS::calc_blended_state(void)
     }
     timing[GPS_BLENDED_INSTANCE].last_fix_time_ms = (uint32_t)temp_time_1;
     timing[GPS_BLENDED_INSTANCE].last_message_time_ms = (uint32_t)temp_time_2;
+}
+
+// ground course in degrees
+float AP_GPS::ground_course(uint8_t instance) const {
+    if (gps_heading_avail(instance)) {
+        return ((AP_GPS_NMEA*)drivers[instance])->get_hdt_course();
+    }
+    return state[instance].ground_course;
+}
+
+bool AP_GPS::gps_heading_avail(uint8_t instance) const {
+    // Check if the HDT param has been enabled, that this is a NMEA GPS and
+    // we are receiving the HDT sentences
+    if (_heading_enable && _type[instance] == GPS_TYPE_NMEA) {
+        return ((AP_GPS_NMEA*)drivers[instance])->hdt_avail();
+    }
+    return false;
 }

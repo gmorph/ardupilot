@@ -225,9 +225,7 @@ public:
     }
 
     // ground course in degrees
-    float ground_course(uint8_t instance) const {
-        return state[instance].ground_course;
-    }
+    float ground_course(uint8_t instance) const;
     float ground_course() const {
         return ground_course(primary_instance);
     }
@@ -366,6 +364,8 @@ public:
 
     void Write_DataFlash_Log_Startup_messages();
 
+    bool gps_heading_avail(uint8_t instance) const;
+
 protected:
 
     // dataflash for logging, if available
@@ -390,6 +390,7 @@ protected:
     AP_Int16 _delay_ms[GPS_MAX_RECEIVERS];
     AP_Int8 _blend_mask;
     AP_Float _blend_tc;
+    AP_Int8 _heading_enable;
 
 private:
     // return gps update rate in milliseconds
